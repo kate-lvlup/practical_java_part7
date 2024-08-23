@@ -44,9 +44,7 @@ package task4;
 
 
 
-
-
-
+// FOR MOODLY
 
 class MyThreads {
     public final static Object den = new Object();
@@ -57,38 +55,58 @@ class MyThreads {
 
     public static Thread t1 = new Thread() {
         public void run() {
-            synchronized (den) {  // Захват den первым
+            synchronized (den) {
                 for (int i = 0; i < 5; i++, n++) {
                     System.out.println("Thread1 n = " + n);
                 }
-                Thread.yield(); // Yield to allow other threads to run
-                synchronized (ada) {  // Захват ada вторым
-                    for (int i = 0; i < 5; i++, m++) {
-                        System.out.println("Thread1 m = " + m);
-                    }
-                    System.out.println("Thread1 success!");
+            }
+            Thread.yield();  // Уступаем управление другому потоку
+
+            try {
+                Thread.sleep(100);  // Позволяем Thread2 выполнить свою часть
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            synchronized (ada) {
+                for (int i = 0; i < 5; i++, m++) {
+                    System.out.println("Thread1 m = " + m);
                 }
+                System.out.println("Thread1 success!");
             }
         }
     };
 
     public static Thread t2 = new Thread() {
         public void run() {
-            synchronized (den) {  // Захват den первым
-                synchronized (ada) {  // Захват ada вторым
-                    for (int i = 0; i < 5; i++, m++) {
-                        System.out.println("Thread2 m = " + m);
-                    }
-                    Thread.yield(); // Yield to allow other threads to run
-                    for (int i = 0; i < 5; i++, n++) {
-                        System.out.println("Thread2 n = " + n);
-                    }
-                    System.out.println("Thread2 success!");
+            synchronized (ada) {
+                for (int i = 0; i < 5; i++, m++) {
+                    System.out.println("Thread2 m = " + m);
                 }
+            }
+            Thread.yield();  // Уступаем управление другому потоку
+
+            try {
+                Thread.sleep(100);  // Позволяем Thread1 выполнить свою часть
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            synchronized (den) {
+                for (int i = 0; i < 5; i++, n++) {
+                    System.out.println("Thread2 n = " + n);
+                }
+                System.out.println("Thread2 success!");
             }
         }
     };
+
+    public static void main(String[] args) {
+        t1.start();
+        t2.start();
+    }
 }
+
 
 
 
